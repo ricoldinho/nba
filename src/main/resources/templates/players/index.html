@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA Players - Gestión de Jugadores</title>
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CDN for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom Styles -->
+    <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-lg">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-basketball"></i> NBA Players Manager
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/players">
+                            <i class="fas fa-list"></i> Jugadores
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/players/active">
+                            <i class="fas fa-check-circle"></i> Activos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/players/stats">
+                            <i class="fas fa-chart-bar"></i> Estadísticas
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container-lg">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1><i class="fas fa-users"></i> Gestión de Jugadores NBA</h1>
+                    <p>Administra el catálogo completo de jugadores de la NBA</p>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <a th:href="@{/players/new}" class="btn btn-create">
+                        <i class="fas fa-plus-circle"></i> Nuevo Jugador
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-lg py-4">
+        <!-- Statistics Section -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stats-section">
+                    <div class="stat-item">
+                        <div class="stat-number" th:text="${#lists.size(players)}">0</div>
+                        <div class="stat-label">Jugadores Totales</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-section">
+                    <div class="stat-item">
+                        <div class="stat-number" th:text="${#lists.size(players.?[active == true])}">0</div>
+                        <div class="stat-label">Jugadores Activos</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-section">
+                    <div class="stat-item">
+                        <div class="stat-number" th:text="${#lists.size(players.?[active == false])}">0</div>
+                        <div class="stat-label">Jugadores Inactivos</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-section">
+                    <div class="stat-item">
+                        <div class="stat-number" th:text="${#lists.size(players.?[team].?[distinctBy{it}])}">0</div>
+                        <div class="stat-label">Equipos</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Players Cards Grid -->
+        <div th:if="${not #lists.isEmpty(players)}" class="row g-4">
+            <div class="col-lg-4 col-md-6" th:each="player : ${players}">
+                <div class="card player-card">
+                    <!-- Card Header with Player Name -->
+                    <div class="player-card-header">
+                        <h5 th:text="${player.name}">Nombre Jugador</h5>
+                        <small class="text-white-50" th:text="${player.team}">Equipo</small>
+                        <div class="jersey-badge" th:text="${player.jerseyNumber != null ? player.jerseyNumber : 'N/A'}">00</div>
+                    </div>
+
+                    <!-- Card Body with Player Details -->
+                    <div class="player-card-body">
+                        <!-- Status Badge -->
+                        <div class="mb-3">
+                            <span th:if="${player.active}" class="status-badge status-active">
+                                <i class="fas fa-check-circle"></i> Activo
+                            </span>
+                            <span th:unless="${player.active}" class="status-badge status-inactive">
+                                <i class="fas fa-times-circle"></i> Inactivo
+                            </span>
+                        </div>
+
+                        <!-- Player Information -->
+                        <div class="player-info">
+                            <span class="player-info-label">País:</span>
+                            <span class="player-info-value" th:text="${player.countryOfOrigin != null ? player.countryOfOrigin : 'N/A'}">-</span>
+                        </div>
+
+                        <div class="player-info">
+                            <span class="player-info-label">Nacimiento:</span>
+                            <span class="player-info-value" th:text="${player.birthDate != null ? #dates.format(player.birthDate, 'dd/MM/yyyy') : 'N/A'}">-</span>
+                        </div>
+
+                        <!-- Position Info -->
+                        <div th:if="${player.position != null}" class="player-info">
+                            <span class="player-info-label">Posición:</span>
+                            <span class="player-info-value" th:text="${player.position.abbreviation}">-</span>
+                        </div>
+
+                        <!-- Body Measurements Info -->
+                        <div th:if="${player.bodyMeasurements != null}" class="player-info">
+                            <span class="player-info-label">Altura:</span>
+                            <span class="player-info-value" th:text="${player.bodyMeasurements.heightCm != null ? player.bodyMeasurements.heightCm + ' cm' : 'N/A'}">-</span>
+                        </div>
+
+                        <!-- Season Statistics Summary -->
+                        <div th:if="${player.seasonStatistics != null && player.seasonStatistics.pointsPerGame != null}" class="player-info">
+                            <span class="player-info-label">PPG:</span>
+                            <span class="player-info-value" th:text="${#numbers.formatDecimal(player.seasonStatistics.pointsPerGame, 1, 1)}">0.0</span>
+                        </div>
+                    </div>
+
+                    <!-- Card Footer with Actions -->
+                    <div class="player-card-footer">
+                        <a th:href="@{/players/{id}(id=${player.id})}" class="btn btn-view btn-sm-custom" title="Ver detalles">
+                            <i class="fas fa-eye"></i> Ver
+                        </a>
+                        <a th:href="@{/players/{id}/edit(id=${player.id})}" class="btn btn-edit btn-sm-custom" title="Editar">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <a th:href="@{/players/{id}/delete-confirm(id=${player.id})}" class="btn btn-delete btn-sm-custom" title="Eliminar">
+                            <i class="fas fa-trash"></i> Borrar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(players)}" class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <h3>No hay jugadores registrados</h3>
+            <p>Comienza agregando un nuevo jugador a la base de datos.</p>
+            <a th:href="@{/players/new}" class="btn btn-create">
+                <i class="fas fa-plus-circle"></i> Crear Primer Jugador
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white-50 py-4 mt-5">
+        <div class="container-lg text-center">
+            <p class="mb-0">&copy; 2026 NBA Players Manager. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

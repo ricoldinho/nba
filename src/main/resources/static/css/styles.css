@@ -1,0 +1,258 @@
+:root {
+    --nba-blue: #1f51ba;
+    --nba-red: #e31828;
+    --nba-white: #ffffff;
+}
+
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar {
+    background: linear-gradient(135deg, var(--nba-blue) 0%, #1a3f8f 100%);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+}
+
+.page-header {
+    background: linear-gradient(135deg, var(--nba-blue) 0%, #1a3f8f 100%);
+    color: var(--nba-white);
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.page-header h1 {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    margin-bottom: 0;
+    opacity: 0.95;
+}
+
+.btn-create {
+    background-color: var(--nba-red);
+    border-color: var(--nba-red);
+    color: var(--nba-white);
+    font-weight: 600;
+    padding: 0.6rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-create:hover {
+    background-color: #c41322;
+    border-color: #c41322;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(227, 24, 40, 0.3);
+    color: var(--nba-white);
+}
+
+.player-card {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.player-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.player-card-header {
+    background: linear-gradient(135deg, var(--nba-blue) 0%, #1a3f8f 100%);
+    color: var(--nba-white);
+    padding: 1.5rem;
+    position: relative;
+}
+
+.player-card-header h5 {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+}
+
+.jersey-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: var(--nba-red);
+    color: var(--nba-white);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.player-card-body {
+    padding: 1.5rem;
+    flex-grow: 1;
+}
+
+.player-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.player-info-label {
+    font-weight: 600;
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.player-info-value {
+    color: #212529;
+    font-weight: 500;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-active {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-inactive {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.player-card-footer {
+    padding: 1rem 1.5rem;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-sm-custom {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    flex: 1;
+    min-width: 80px;
+}
+
+.btn-view {
+    background-color: var(--nba-blue);
+    color: var(--nba-white);
+    border: none;
+}
+
+.btn-view:hover {
+    background-color: #1a3f8f;
+    color: var(--nba-white);
+    transform: scale(1.05);
+}
+
+.btn-edit {
+    background-color: #ffc107;
+    color: #212529;
+    border: none;
+}
+
+.btn-edit:hover {
+    background-color: #e0a800;
+    color: #212529;
+    transform: scale(1.05);
+}
+
+.btn-delete {
+    background-color: #dc3545;
+    color: var(--nba-white);
+    border: none;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+    color: var(--nba-white);
+    transform: scale(1.05);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.empty-state p {
+    color: #adb5bd;
+    margin-bottom: 1.5rem;
+}
+
+.filter-section {
+    background-color: var(--nba-white);
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filter-section h6 {
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--nba-blue);
+}
+
+.stats-section {
+    background-color: var(--nba-white);
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1rem;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--nba-blue);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+}
