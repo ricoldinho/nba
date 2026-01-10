@@ -91,7 +91,6 @@
             <div class="col-md-3">
                 <div class="stats-section">
                     <div class="stat-item">
-                        <div class="stat-number" th:text="${#lists.size(players.?[team].?[distinctBy{it}])}">0</div>
                         <div class="stat-label">Equipos</div>
                     </div>
                 </div>
@@ -129,7 +128,7 @@
 
                         <div class="player-info">
                             <span class="player-info-label">Nacimiento:</span>
-                            <span class="player-info-value" th:text="${player.birthDate != null ? #dates.format(player.birthDate, 'dd/MM/yyyy') : 'N/A'}">-</span>
+                            <span class="player-info-value" th:text="${player.birthDate != null ? #temporals.format(player.birthDate, 'dd/MM/yyyy') : 'N/A'}">-</span>
                         </div>
 
                         <!-- Position Info -->

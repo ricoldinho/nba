@@ -1,6 +1,9 @@
 -- NBA Players Sample Data
 -- This file is automatically loaded by Spring Boot on application startup
 
+-- Disable foreign key checks for data loading
+SET FOREIGN_KEY_CHECKS=0;
+
 -- Insert sample players
 INSERT INTO players (name, jersey_number, team, country_of_origin, birth_date, photo_url, active) 
 VALUES ('LeBron James', 23, 'Los Angeles Lakers', 'USA', '1984-12-30', 'https://example.com/lebron.jpg', true);
@@ -37,3 +40,6 @@ VALUES ('Kyrie Irving', 11, 'Dallas Mavericks', 'USA', '1992-03-23', 'https://ex
 
 INSERT INTO players (name, jersey_number, team, country_of_origin, birth_date, photo_url, active) 
 VALUES ('Chris Paul', 3, 'Golden State Warriors', 'USA', '1985-05-06', 'https://example.com/chris_paul.jpg', false);
+
+-- Re-enable foreign key checks
+SET FOREIGN_KEY_CHECKS=1;
