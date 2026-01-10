@@ -153,7 +153,7 @@ package com.app.store.web;
 import com.app.store.dto.OrderRequestDTO;
 import com.app.store.dto.OrderResponseDTO;
 import com.app.store.service.OrderService;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
