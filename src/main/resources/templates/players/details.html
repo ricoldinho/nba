@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${player.name} + ' - NBA Players'">Player Details - NBA Players</title>
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CDN for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom Styles -->
+    <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-lg">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-basketball"></i> NBA Players Manager
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/players">
+                            <i class="fas fa-list"></i> Jugadores
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/players/active">
+                            <i class="fas fa-check-circle"></i> Activos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/players/stats">
+                            <i class="fas fa-chart-bar"></i> Estadísticas
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Player Header Section -->
+    <div class="player-detail-header">
+        <div class="container-lg">
+            <div class="row align-items-center">
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <img th:src="${player.photoUrl}" alt="Player Photo" class="player-photo" th:if="${player.photoUrl}">
+                    <div th:if="!${player.photoUrl}" style="width: 100%; max-width: 300px; height: 300px; background-color: rgba(255,255,255,0.1); border-radius: 12px; border: 4px solid #ffffff; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-user-circle" style="font-size: 8rem; opacity: 0.5;"></i>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="player-team-badge" th:text="${player.team}">Team</div>
+                    <h1 class="player-title" th:text="${player.name}">Player Name</h1>
+                    <div class="mb-3">
+                        <span style="font-size: 0.95rem; opacity: 0.9;">Jersey Number:</span>
+                        <span class="jersey-number-large" th:text="${player.jerseyNumber != null} ? ${player.jerseyNumber} : '—'">#</span>
+                    </div>
+                    <div>
+                        <span th:class="${'active-badge ' + (player.active ? 'yes' : 'no')}">
+                            <i th:class="${player.active} ? 'fas fa-check-circle' : 'fas fa-times-circle'"></i>
+                            <span th:text="${player.active} ? 'Activo' : 'Inactivo'">Status</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-lg pb-5">
+        <!-- Personal Information Section -->
+        <div class="detail-section">
+            <h3><i class="fas fa-user"></i> Información Personal</h3>
+            <div class="info-row">
+                <div class="info-box">
+                    <div class="info-box-label">Nombre Completo</div>
+                    <div class="info-box-value" th:text="${player.name}">Name</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-box-label">País de Origen</div>
+                    <div class="info-box-value" th:text="${player.countryOfOrigin != null} ? ${player.countryOfOrigin} : 'N/A'">Country</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-box-label">Fecha de Nacimiento</div>
+                    <div class="info-box-value" th:text="${player.birthDate != null} ? ${#temporals.format(player.birthDate, 'dd/MM/yyyy')} : 'N/A'">Date</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Position Information Section -->
+        <div class="detail-section" th:if="${player.position}">
+            <h3><i class="fas fa-basketball"></i> Posición en la Cancha</h3>
+            <div class="info-row">
+                <div class="info-box">
+                    <div class="info-box-label">Posición Principal</div>
+                    <div class="info-box-value" th:text="${player.position.primary != null} ? ${player.position.primary} : 'N/A'">Primary</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-box-label">Posición Secundaria</div>
+                    <div class="info-box-value" th:text="${player.position.secondary != null} ? ${player.position.secondary} : 'N/A'">Secondary</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Body Measurements Section -->
+        <div class="detail-section" th:if="${player.bodyMeasurements}">
+            <h3><i class="fas fa-ruler-combined"></i> Medidas Físicas</h3>
+            <div class="stats-grid">
+                <div class="stat-card" th:if="${player.bodyMeasurements.height != null}">
+                    <div class="stat-card-value" th:text="${player.bodyMeasurements.height}">0</div>
+                    <div class="stat-card-label">Altura (cm)</div>
+                </div>
+                <div class="stat-card" th:if="${player.bodyMeasurements.weight != null}">
+                    <div class="stat-card-value" th:text="${player.bodyMeasurements.weight}">0</div>
+                    <div class="stat-card-label">Peso (kg)</div>
+                </div>
+                <div class="stat-card" th:if="${player.bodyMeasurements.wingspan != null}">
+                    <div class="stat-card-value" th:text="${player.bodyMeasurements.wingspan}">0</div>
+                    <div class="stat-card-label">Envergadura (cm)</div>
+                </div>
+                <div class="stat-card" th:if="${player.bodyMeasurements.verticalReach != null}">
+                    <div class="stat-card-value" th:text="${player.bodyMeasurements.verticalReach}">0</div>
+                    <div class="stat-card-label">Alcance Vertical (cm)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Season Statistics Section -->
+        <div class="detail-section" th:if="${player.seasonStatistics}">
+            <h3><i class="fas fa-chart-bar"></i> Estadísticas de Temporada</h3>
+            <div class="stats-grid">
+                <div class="stat-card" th:if="${player.seasonStatistics.pointsPerGame != null}">
+                    <div class="stat-card-value" th:text="${player.seasonStatistics.pointsPerGame}">0</div>
+                    <div class="stat-card-label">Puntos por Juego</div>
+                </div>
+                <div class="stat-card" th:if="${player.seasonStatistics.reboundsPerGame != null}">
+                    <div class="stat-card-value" th:text="${player.seasonStatistics.reboundsPerGame}">0</div>
+                    <div class="stat-card-label">Rebotes por Juego</div>
+                </div>
+                <div class="stat-card" th:if="${player.seasonStatistics.assistsPerGame != null}">
+                    <div class="stat-card-value" th:text="${player.seasonStatistics.assistsPerGame}">0</div>
+                    <div class="stat-card-label">Asistencias por Juego</div>
+                </div>
+                <div class="stat-card" th:if="${player.seasonStatistics.stealsPerGame != null}">
+                    <div class="stat-card-value" th:text="${player.seasonStatistics.stealsPerGame}">0</div>
+                    <div class="stat-card-label">Robos por Juego</div>
+                </div>
+                <div class="stat-card" th:if="${player.seasonStatistics.blocksPerGame != null}">
+                    <div class="stat-card-value" th:text="${player.seasonStatistics.blocksPerGame}">0</div>
+                    <div class="stat-card-label">Bloqueos por Juego</div>
+                </div>
+                <div class="stat-card" th:if="${player.seasonStatistics.fieldGoalPercentage != null}">
+                    <div class="stat-card-value" th:text="${#numbers.formatDecimal(player.seasonStatistics.fieldGoalPercentage, 1, 1)}">0</div>
+                    <div class="stat-card-label">% de Tiro</div>
+                </div>
+                <div class="stat-card" th:if="${player.seasonStatistics.threePointPercentage != null}">
+                    <div class="stat-card-value" th:text="${#numbers.formatDecimal(player.seasonStatistics.threePointPercentage, 1, 1)}">0</div>
+                    <div class="stat-card-label">% de 3 Puntos</div>
+                </div>
+                <div class="stat-card" th:if="${player.seasonStatistics.freeThrowPercentage != null}">
+                    <div class="stat-card-value" th:text="${#numbers.formatDecimal(player.seasonStatistics.freeThrowPercentage, 1, 1)}">0</div>
+                    <div class="stat-card-label">% de Tiros Libres</div>
+                </div>
+                <div class="stat-card" th:if="${player.seasonStatistics.gamesPlayed != null}">
+                    <div class="stat-card-value" th:text="${player.seasonStatistics.gamesPlayed}">0</div>
+                    <div class="stat-card-label">Juegos Jugados</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Details Section -->
+        <div class="detail-section">
+            <h3><i class="fas fa-info-circle"></i> Información Adicional</h3>
+            <div class="detail-row">
+                <div class="detail-label">ID del Jugador</div>
+                <div class="detail-value" th:text="${player.id}">ID</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Equipo</div>
+                <div class="detail-value" th:text="${player.team}">Team</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Número de Jersey</div>
+                <div class="detail-value" th:text="${player.jerseyNumber != null} ? ${player.jerseyNumber} : 'N/A'">#</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Estado</div>
+                <div class="detail-value">
+                    <span th:class="${'active-badge ' + (player.active ? 'yes' : 'no')}">
+                        <span th:text="${player.active} ? 'Activo' : 'Inactivo'">Status</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <a href="/players" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Volver a la Lista
+            </a>
+            <a th:href="@{/players/{id}/edit(id=${player.id})}" class="btn-edit-detail">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <a th:href="@{/players/{id}/delete(id=${player.id})}" class="btn-delete-detail" 
+               onclick="return confirm('¿Estás seguro de que quieres eliminar este jugador?');">
+                <i class="fas fa-trash-alt"></i> Eliminar
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="background-color: #1f51ba; color: #ffffff; padding: 2rem 0; margin-top: 4rem; text-align: center;">
+        <div class="container-lg">
+            <p style="margin-bottom: 0;">&copy; 2026 NBA Players Manager. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

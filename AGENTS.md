@@ -88,17 +88,17 @@ To ensure clarity, **every Spring annotation must be explained**.
     * *Example:* `shouldReturnUserDTO_WhenIdExists()`
     * *Example:* `shouldThrowException_WhenStockIsInsufficient()`
 
-### 5.1. Service Layer Testing Rules
+### 6.1. Service Layer Testing Rules
 * **Goal:** Test business logic in isolation.
 * **Tools:** Use `@RunWith(MockitoJUnitRunner.class)` for JUnit 4 compatibility.
 * **Mocks:** ALL dependencies (Repositories, other Services) must be mocked using `@Mock`.
 
-### 5.2. Controller Layer Testing Rules
+### 6.2. Controller Layer Testing Rules
 * **Goal:** Test HTTP status, JSON serialization, and Input Validation.
 * **Tools:** Use `@WebMvcTest(ControllerClass.class)` and `MockMvc`.
 * **Restriction:** Do NOT load the full context (`@SpringBootTest`). Mock the Service layer using `@MockBean`.
 
-### 5.3. Test Implementation Example
+### 6.3. Test Implementation Example
 
 ```java
 package com.app.store.service;
@@ -145,7 +145,7 @@ public class OrderServiceTest {
 
 Use the following code snippets as the absolute reference for style, naming, documentation, and architecture.
 
-### 6.1. Controller Example
+### 7.1. Controller Example
 
 ```java
 package com.app.store.web;
@@ -192,7 +192,7 @@ public class OrderController {
 }
 ```
 
-### 6.2. Service Example
+### 7.2. Service Example
 
 ```java
 package com.app.store.service;
