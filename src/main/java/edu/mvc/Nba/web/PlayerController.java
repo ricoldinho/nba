@@ -164,37 +164,17 @@ public class PlayerController {
     }
 
     /**
-     * Objective: Processes the deletion of a player after confirmation.
+     * Objective: Deletes a player via modal confirmation (POST with _method=DELETE).
      *
      * Input: id - The player ID from the URL path.
-     * Output: String - Redirect to the player list after deletion or if player not found.
+     * Output: String - Redirect to the player list after deletion.
      */
-    // @GetMapping("{id}/delete"): Maps HTTP GET requests to delete a player.
-    // Note: In production, use POST with a hidden _method parameter for proper REST conventions.
-    @GetMapping("{id}/delete")
-    public String deletePlayer(
+    // @PostMapping("{id}"): Maps HTTP POST requests with _method=DELETE for deleting a specific player.
+    @PostMapping("{id}")
+    public String deletePlayerModal(
         @PathVariable Long id
     ) {
         playerService.deletePlayer(id);
-        return "redirect:/players";
-    }
-
-    /**
-     * Objective: Displays a confirmation page before deleting a player.
-     *
-     * Input: id - The player ID from the URL path.
-     * Output: String - The view name "players/delete-confirm" with player data, or redirect if not found.
-     */
-    @GetMapping("{id}/delete-confirm")
-    public String showDeleteConfirmation(
-        @PathVariable Long id,
-        Model model
-    ) {
-        Optional<Player> player = playerService.getPlayerById(id);
-        if (player.isPresent()) {
-            model.addAttribute("player", player.get());
-            return "players/delete-confirm";
-        }
         return "redirect:/players";
     }
 
