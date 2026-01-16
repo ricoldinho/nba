@@ -165,9 +165,9 @@
                         <a th:href="@{/players/{id}/edit(id=${player.id})}" class="btn btn-edit btn-sm-custom" title="Editar">
                             <i class="fas fa-edit"></i> Editar
                         </a>
-                        <a th:href="@{/players/{id}/delete-confirm(id=${player.id})}" class="btn btn-delete btn-sm-custom" title="Eliminar">
+                        <button type="button" class="btn btn-delete btn-sm-custom" th:data-player-id="${player.id}" th:data-player-name="${player.name}" data-bs-toggle="modal" data-bs-target="#deleteModal" title="Eliminar">
                             <i class="fas fa-trash"></i> Borrar
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -181,6 +181,71 @@
             <a th:href="@{/players/new}" class="btn btn-create">
                 <i class="fas fa-plus-circle"></i> Crear Primer Jugador
             </a>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteModalLabel">
+                        <i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    
+    <!-- Delete Modal Script -->
+    <script>
+        // Handle delete modal interactions
+        const deleteModal = document.getElementById('deleteModal');
+        const playerNameModal = document.getElementById('playerNameModal');
+        const deleteForm = document.getElementById('deleteForm');
+
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget; // Button that triggered the modal
+            const playerId = button.getAttribute('data-player-id');
+            const playerName = button.getAttribute('data-player-name');
+
+            // Update modal content
+            playerNameModal.textContent = playerName;
+
+            // Set form action to the delete endpoint
+            deleteForm.action = `/players/${playerId}`;
+            deleteForm.method = 'POST';
+
+            // Add hidden input for DELETE method (if using Spring's HiddenHttpMethodFilter)
+            // Or use POST directly if your endpoint accepts POST
+            let methodInput = deleteForm.querySelector('input[name="_method"]');
+            if (!methodInput) {
+                methodInput = document.createElement('input');
+                methodInput.type = 'hidden';
+                methodInput.name = '_method';
+                methodInput.value = 'DELETE';
+                deleteForm.appendChild(methodInput);
+            }
+        });
+
+        // Reset form when modal is closed
+        deleteModal.addEventListener('hidden.bs.modal', function () {
+            deleteForm.reset();
+        });
+    </script>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar al jugador <strong id="playerNameModal">-</strong>?</p>
+                    <p class="text-muted small mb-0">Esta acción <strong>no se puede deshacer</strong>.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> No, Cancelar
+                    </button>
+                    <form id="deleteForm" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Sí, Eliminar
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
