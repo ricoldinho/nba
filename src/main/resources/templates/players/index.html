@@ -91,6 +91,7 @@
             <div class="col-md-3">
                 <div class="stats-section">
                     <div class="stat-item">
+                        <div class="stat-number" th:text="${teams != null ? #lists.size(teams) : '—'}">0</div>
                         <div class="stat-label">Equipos</div>
                     </div>
                 </div>
@@ -101,6 +102,12 @@
         <div th:if="${not #lists.isEmpty(players)}" class="row g-4">
             <div class="col-lg-4 col-md-6" th:each="player : ${players}">
                 <div class="card player-card">
+                    <!-- Player Photo -->
+                    <img th:if="${player.photoUrl}" th:src="${player.photoUrl}" alt="Player Photo" class="player-card-image">
+                    <div th:unless="${player.photoUrl}" class="player-card-image-placeholder">
+                        <i class="fas fa-user"></i>
+                    </div>
+
                     <!-- Card Header with Player Name -->
                     <div class="player-card-header">
                         <h5 th:text="${player.name}">Nombre Jugador</h5>
@@ -134,7 +141,7 @@
                         <!-- Position Info -->
                         <div th:if="${player.position != null}" class="player-info">
                             <span class="player-info-label">Posición:</span>
-                            <span class="player-info-value" th:text="${player.position.abbreviation}">-</span>
+                            <span class="player-info-value" th:text="${player.position.description}">-</span>
                         </div>
 
                         <!-- Body Measurements Info -->

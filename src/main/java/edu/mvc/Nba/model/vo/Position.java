@@ -53,4 +53,12 @@ public class Position {
     public void setType(PositionType type) { 
         this.type = type; 
     }
+    
+    public String getDescription() {
+        return type != null ? type.getDescription() : null;
+    }
+    
+    public String getCode() {
+        return type != null ? type.getCode() : null;
+    }
 }

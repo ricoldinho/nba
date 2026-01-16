@@ -71,6 +71,27 @@ body {
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
 
+.player-card-image {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    background-color: #f0f0f0;
+}
+
+.player-card-image-placeholder {
+    width: 100%;
+    height: 250px;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #dee2e6;
+}
+
+.player-card-image-placeholder i {
+    font-size: 3rem;
+}
+
 .player-card-header {
     background: linear-gradient(135deg, var(--nba-blue) 0%, #1a3f8f 100%);
     color: var(--nba-white);
