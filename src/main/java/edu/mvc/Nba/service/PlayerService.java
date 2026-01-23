@@ -2,7 +2,9 @@ package edu.mvc.nba.service;
 
 import edu.mvc.nba.model.Player;
 import edu.mvc.nba.model.Team;
+import edu.mvc.nba.dto.PlayerTeamDTO;
 import edu.mvc.nba.repository.PlayerRepository;
+import edu.mvc.nba.repository.TeamRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,9 +22,11 @@ import java.util.Optional;
 public class PlayerService {
 
     private final PlayerRepository playerRepository;
+    private final TeamRepository teamRepository;
 
-    public PlayerService(PlayerRepository playerRepository) {
+    public PlayerService(PlayerRepository playerRepository, TeamRepository teamRepository) {
         this.playerRepository = playerRepository;
+        this.teamRepository = teamRepository;
     }
 
     /**
@@ -94,7 +98,7 @@ public class PlayerService {
         return playerRepository.findById(id).map(existingPlayer -> {
             existingPlayer.setName(updatedPlayer.getName());
             existingPlayer.setJerseyNumber(updatedPlayer.getJerseyNumber());
-            existingPlayer.setTeam(updatedPlayer.getTeam());
+            existingPlayer.setTeamEntity(updatedPlayer.getTeamEntity());
             existingPlayer.setCountryOfOrigin(updatedPlayer.getCountryOfOrigin());
             existingPlayer.setBirthDate(updatedPlayer.getBirthDate());
             existingPlayer.setPosition(updatedPlayer.getPosition());
@@ -261,5 +265,96 @@ public class PlayerService {
             return getAllPlayers();
         }
         return playerRepository.findByNameContainingIgnoreCase(name.trim());
+    }
+
+    /**
+     * Objective: Creates a new team and player together from a combined DTO.
+     *
+     * Input: dto - PlayerTeamDTO containing both player and team information.
+     * Output: Player - The newly created player with the associated team.
+     */
+    // @Transactional: Ensures both team and player operations succeed or fail together as a single atomic unit.
+    @Transactional
+    public Player createPlayerWithTeam(PlayerTeamDTO dto) {
+        // Check if team already exists by name
+        Optional<Team> existingTeam = teamRepository.findByName(dto.getTeamName());
+        
+        Team team;
+        if (existingTeam.isPresent()) {
+            // Use existing team if found
+            team = existingTeam.get();
+        } else {
+            // Create new team from DTO
+            team = new Team(
+                dto.getTeamName(),
+                dto.getTeamCity(),
+                dto.getTeamCountry()
+            );
+            if (dto.getTeamFoundingYear() != null) {
+                team.setFoundingYear(dto.getTeamFoundingYear());
+            }
+            team = teamRepository.save(team);
+        }
+        
+        // Create player with the team
+        Player player = new Player(
+            dto.getPlayerName(),
+            dto.getJerseyNumber(),
+            team
+        );
+        player.setCountryOfOrigin(dto.getCountryOfOrigin());
+        player.setBirthDate(dto.getBirthDate());
+        player.setPhotoUrl(dto.getPhotoUrl());
+        player.setActive(dto.getActive());
+        
+        return playerRepository.save(player);
+    }
+
+    /**
+     * Objective: Retrieves all players from a specific team by team name.
+     *
+     * Input: teamName - The team name string.
+     * Output: List<Player> - All players in that team, or empty list if team not found.
+     */
+    @Transactional(readOnly = true)
+    public List<Player> getPlayersByTeamName(String teamName) {
+        Optional<Team> team = teamRepository.findByName(teamName);
+        return team.map(this::getPlayersByTeam).orElseGet(List::of);
+    }
+
+    /**
+     * Objective: Retrieves all active players from a specific team by team name.
+     *
+     * Input: teamName - The team name string.
+     * Output: List<Player> - All active players in that team, or empty list if team not found.
+     */
+    @Transactional(readOnly = true)
+    public List<Player> getActivePlayersByTeamName(String teamName) {
+        Optional<Team> team = teamRepository.findByName(teamName);
+        return team.map(this::getActivePlayersByTeam).orElseGet(List::of);
+    }
+
+    /**
+     * Objective: Counts the total number of players in a specific team by team name.
+     *
+     * Input: teamName - The team name string.
+     * Output: Long - The count of all players in that team, or 0 if team not found.
+     */
+    @Transactional(readOnly = true)
+    public Long countPlayersByTeamName(String teamName) {
+        Optional<Team> team = teamRepository.findByName(teamName);
+        return team.map(this::countPlayersByTeam).orElse(0L);
+    }
+
+    /**
+     * Objective: Counts the total number of active players in a specific team by team name.
+     *
+     * Input: teamName - The team name string.
+     * Output: Long - The count of active players in that team, or 0 if team not found.
+     */
+    @Transactional(readOnly = true)
+    public Long countActivePlayersByTeamName(String teamName) {
+        Optional<Team> team = teamRepository.findByName(teamName);
+        return team.map(this::countActivePlayersByTeam).orElse(0L);
     }
 }

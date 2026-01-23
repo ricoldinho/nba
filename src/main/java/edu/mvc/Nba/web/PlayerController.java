@@ -1,13 +1,14 @@
 package edu.mvc.nba.web;
 
 import edu.mvc.nba.model.Player;
+import edu.mvc.nba.dto.PlayerTeamDTO;
 import edu.mvc.nba.service.PlayerService;
+import edu.mvc.nba.service.TeamService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,10 +26,12 @@ import java.util.Optional;
 public class PlayerController {
 
     private final PlayerService playerService;
+    private final TeamService teamService;
 
-    // @Autowired: (Implicit) Injects the required PlayerService dependency via constructor injection.
-    public PlayerController(PlayerService playerService) {
+    // @Autowired: (Implicit) Injects the required PlayerService and TeamService dependencies via constructor injection.
+    public PlayerController(PlayerService playerService, TeamService teamService) {
         this.playerService = playerService;
+        this.teamService = teamService;
     }
 
     /**
@@ -100,6 +103,7 @@ public class PlayerController {
     public String showCreateForm(Model model) {
         model.addAttribute("player", new Player());
         model.addAttribute("isEdit", false);
+        model.addAttribute("teams", teamService.getAllActiveTeams());
         return "players/form";
     }
 
@@ -144,6 +148,7 @@ public class PlayerController {
         if (player.isPresent()) {
             model.addAttribute("player", player.get());
             model.addAttribute("isEdit", true);
+            model.addAttribute("teams", teamService.getAllActiveTeams());
             return "players/form";
         }
         return "redirect:/players";
@@ -204,7 +209,7 @@ public class PlayerController {
         Model model
     ) {
         model.addAttribute("team", team);
-        model.addAttribute("players", playerService.getPlayersByTeam(team));
+        model.addAttribute("players", playerService.getPlayersByTeamName(team));
         return "players/by-team";
     }
 
@@ -220,7 +225,7 @@ public class PlayerController {
         Model model
     ) {
         model.addAttribute("team", team);
-        model.addAttribute("players", playerService.getActivePlayersByTeam(team));
+        model.addAttribute("players", playerService.getActivePlayersByTeamName(team));
         return "players/by-team";
     }
 
@@ -251,8 +256,8 @@ public class PlayerController {
         @RequestParam String team,
         Model model
     ) {
-        Long totalPlayers = playerService.countPlayersByTeam(team);
-        Long activePlayers = playerService.countActivePlayersByTeam(team);
+        Long totalPlayers = playerService.countPlayersByTeamName(team);
+        Long activePlayers = playerService.countActivePlayersByTeamName(team);
         
         model.addAttribute("team", team);
         model.addAttribute("totalPlayers", totalPlayers);
@@ -307,6 +312,43 @@ public class PlayerController {
             return "redirect:/players/" + id;
         }
         return "redirect:/players";
+    }
+
+    /**
+     * Objective: Displays the form for creating a new player and team together.
+     *
+     * Input: (None)
+     * Output: String - The view name "players/player-team-form" with an empty PlayerTeamDTO object.
+     */
+    // @GetMapping("new-with-team"): Maps HTTP GET requests to show the combined create form.
+    @GetMapping("new-with-team")
+    public String showCreatePlayerWithTeamForm(Model model) {
+        model.addAttribute("playerTeamDTO", new PlayerTeamDTO());
+        return "players/player-team-form";
+    }
+
+    /**
+     * Objective: Processes the creation of a new player and team from a combined form submission.
+     *
+     * Input: playerTeamDTO - DTO containing both player and team data from the form.
+     *        bindingResult - Validation results from the form submission.
+     * Output: String - Redirect to the new player's details page or back to form if validation fails.
+     */
+    // @PostMapping("create-with-team"): Maps HTTP POST requests for creating player and team together.
+    // @Valid: Triggers validation constraints defined in the PlayerTeamDTO.
+    // @ModelAttribute: Binds form data to the playerTeamDTO object automatically.
+    @PostMapping("create-with-team")
+    public String createPlayerWithTeam(
+        @Valid @ModelAttribute("playerTeamDTO") PlayerTeamDTO playerTeamDTO,
+        // BindingResult: Captures validation errors from the @Valid annotation.
+        BindingResult bindingResult,
+        Model model
+    ) {
+        if (bindingResult.hasErrors()) {
+            return "players/player-team-form";
+        }
+        Player savedPlayer = playerService.createPlayerWithTeam(playerTeamDTO);
+        return "redirect:/players/" + savedPlayer.getId();
     }
 
 }

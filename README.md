@@ -8,6 +8,46 @@ This project is an educational implementation designed to demonstrate and explai
 
 ## 🆕 Recent Updates
 
+### Team Entity & Player-Team Relationship (January 23, 2026)
+A new **Team entity** has been created with a **One-to-Many relationship** to Player:
+
+✅ **New Entity:**
+- Created [Team.java](src/main/java/edu/mvc/nba/model/Team.java) with properties: `id`, `name`, `city`, `country`, `foundingYear`, `active`
+- Relationship: `@OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)`
+
+✅ **Player Entity Updates:**
+- Replaced `String team` field with `@ManyToOne` relationship to Team entity
+- Updated [Player.java](src/main/java/edu/mvc/nba/model/Player.java) with `@JoinColumn(name = "team_id", nullable = false)`
+- Added `getTeamEntity()` and `setTeamEntity()` methods for entity access
+- Maintained `getTeam()` for backward compatibility (returns team name)
+
+✅ **Repository Layer:**
+- Created [TeamRepository.java](src/main/java/edu/mvc/nba/repository/TeamRepository.java) with methods: `findByName()`, `findByActive()`, `findByCity()`, `findByCountry()`, `findAllActiveTeams()`
+- Updated [PlayerRepository.java](src/main/java/edu/mvc/nba/repository/PlayerRepository.java): All team-related queries now use Team entity instead of String
+
+✅ **Service Layer:**
+- Created [TeamService.java](src/main/java/edu/mvc/nba/service/TeamService.java) with full CRUD operations and team-specific queries
+- Updated [PlayerService.java](src/main/java/edu/mvc/nba/service/PlayerService.java): 
+  - Updated team-related methods to use Team objects
+  - Added `getPlayersByTeamName()`, `getActivePlayersByTeamName()`, `countPlayersByTeamName()`, `countActivePlayersByTeamName()` for String-based lookups
+  - Injected `TeamRepository` for team management
+
+✅ **DTO & Form Handling:**
+- Created [PlayerTeamDTO.java](src/main/java/edu/mvc/nba/dto/PlayerTeamDTO.java) for combined player-team form submission
+- DTO includes validation annotations and properties from both Player and Team
+
+✅ **Controller Enhancements:**
+- Injected `TeamService` into [PlayerController.java](src/main/java/edu/mvc/nba/web/PlayerController.java)
+- Updated `showCreateForm()` and `showEditForm()` to pass `teams` list to view
+- Added new endpoints:
+  - `showCreatePlayerWithTeamForm()` → GET `/players/new-with-team`
+  - `createPlayerWithTeam()` → POST `/players/create-with-team`
+
+✅ **Form Updates:**
+- Modified [form.html](src/main/resources/templates/players/form.html): Changed team input from text field to `<select>` dropdown with active teams
+- Created [player-team-form.html](src/main/resources/templates/players/player-team-form.html): New form for creating player and team together
+- Both forms include proper validation error handling and responsive design
+
 ### Player Search Feature (January 2026)
 A new **search functionality** has been added to filter players by name:
 

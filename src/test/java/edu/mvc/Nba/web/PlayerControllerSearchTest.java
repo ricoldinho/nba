@@ -2,6 +2,7 @@ package edu.mvc.nba.web;
 
 import edu.mvc.nba.model.Player;
 import edu.mvc.nba.service.PlayerService;
+import edu.mvc.nba.service.TeamService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -30,6 +31,9 @@ public class PlayerControllerSearchTest {
     @Mock
     private PlayerService playerService;
 
+    @Mock
+    private TeamService teamService;
+
     private PlayerController playerController;
 
     /**
@@ -42,7 +46,7 @@ public class PlayerControllerSearchTest {
     public void setUp() {
         // MockitoAnnotations.openMocks: Initializes Mockito annotations for this test class.
         MockitoAnnotations.openMocks(this);
-        playerController = new PlayerController(playerService);
+        playerController = new PlayerController(playerService, teamService);
         mockMvc = MockMvcBuilders.standaloneSetup(playerController).build();
     }
 

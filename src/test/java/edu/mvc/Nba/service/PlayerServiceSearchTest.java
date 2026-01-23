@@ -2,7 +2,6 @@ package edu.mvc.nba.service;
 
 import edu.mvc.nba.model.Player;
 import edu.mvc.nba.repository.PlayerRepository;
-import edu.mvc.nba.service.PlayerService;
 
 import org.junit.Test;
 import org.junit.Before;
