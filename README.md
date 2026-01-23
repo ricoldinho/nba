@@ -6,6 +6,51 @@ This project is an educational implementation designed to demonstrate and explai
 
 ---
 
+## 🆕 Recent Updates
+
+### Player Search Feature (January 2026)
+A new **search functionality** has been added to filter players by name:
+
+✅ **Backend Implementation:**
+- Added `findByNameContainingIgnoreCase()` method in [PlayerRepository.java](src/main/java/edu/mvc/nba/repository/PlayerRepository.java) with JPQL query for case-insensitive partial name matching
+- Added `searchPlayersByName()` method in [PlayerService.java](src/main/java/edu/mvc/nba/service/PlayerService.java)
+- Updated `listPlayers()` endpoint in [PlayerController.java](src/main/java/edu/mvc/nba/web/PlayerController.java) to accept optional `@RequestParam searchName`
+
+✅ **Frontend Implementation:**
+- Added search form with input field and buttons in [index.html](src/main/resources/templates/players/index.html)
+- Added responsive CSS styling in [styles.css](src/main/resources/static/css/styles.css)
+
+✅ **Testing:**
+- Created [PlayerServiceSearchTest.java](src/test/java/edu/mvc/Nba/service/PlayerServiceSearchTest.java) with 5 unit tests
+- Created [PlayerControllerSearchTest.java](src/test/java/edu/mvc/Nba/web/PlayerControllerSearchTest.java) with 6 unit tests
+- Added JUnit 4 (4.13.2) and Mockito (5.2.0) dependencies to pom.xml
+
+### Player Form (Create/Edit) Feature (January 2026)
+A comprehensive **player form** has been created for adding and editing players:
+
+✅ **Frontend Implementation:**
+- Created [form.html](src/main/resources/templates/players/form.html) with Thymeleaf binding (`th:object` and `th:field`)
+- Form supports both create and edit operations with conditional rendering
+- All form styles centralized in [styles.css](src/main/resources/static/css/styles.css)
+- Responsive design with Bootstrap 5
+- Form validation error display
+
+✅ **Form Features:**
+- **Basic Information Section**: Name, Jersey Number, Team, Country, Birth Date, Photo URL
+- **Status Section**: Active/Inactive toggle switch
+- **Binding**: Uses `th:object="${player}"` and `th:field="*{fieldName}"` for two-way binding
+- **Validation**: Server-side error display with custom styling
+- **Actions**: Cancel button and dynamic submit button (Create/Save)
+
+✅ **Backend Support:**
+- Controller methods already support form handling:
+  - `showCreateForm()` → GET `/players/new` (displays empty form)
+  - `createPlayer()` → POST `/players` (creates new player)
+  - `showEditForm()` → GET `/players/{id}/edit` (displays prefilled form)
+  - `updatePlayer()` → POST `/players/{id}/edit` (updates existing player)
+
+---
+
 ## 🏗️ Architecture Overview
 
 The project follows a **Clean Architecture** pattern with strict separation of concerns:
@@ -368,6 +413,100 @@ src/main/resources/
 
 ---
 
+## 🔍 Player Search Feature
+
+The application includes a **player search functionality** that allows users to filter players by partial name matching.
+
+### How It Works
+
+#### Frontend (Thymeleaf Template):
+```html
+<!-- Search Form in index.html -->
+<form method="GET" th:action="@{/players}" class="search-form-card">
+    <input type="text" name="searchName" placeholder="Buscar jugador por nombre..." 
+        th:value="${searchName != null ? searchName : ''}">
+    <button type="submit" class="btn btn-primary">
+        <i class="fas fa-search"></i> Buscar
+    </button>
+    <a th:href="@{/players}" class="btn btn-secondary">
+        <i class="fas fa-redo"></i> Limpiar
+    </a>
+</form>
+```
+
+#### Backend (Controller):
+```java
+/**
+ * Objective: Displays a list of all players with optional search filter by name.
+ *
+ * Input: searchName - Optional search term (case-insensitive partial match).
+ * Output: String - "players/index" view with filtered players.
+ */
+@GetMapping
+public String listPlayers(
+    // @RequestParam: Extracts the 'searchName' query parameter with optional empty default.
+    @RequestParam(name = "searchName", required = false, defaultValue = "") String searchName,
+    Model model
+) {
+    List<Player> players;
+    if (searchName != null && !searchName.trim().isEmpty()) {
+        players = playerService.searchPlayersByName(searchName);
+        model.addAttribute("searchName", searchName);
+    } else {
+        players = playerService.getAllPlayers();
+    }
+    model.addAttribute("players", players);
+    return "players/index";
+}
+```
+
+#### Service Layer:
+```java
+/**
+ * Objective: Searches for players by name using partial matching (case-insensitive).
+ *
+ * Input: name - The search term to match against player names.
+ * Output: List<Player> - All players whose name contains the search term.
+ */
+@Transactional(readOnly = true)
+public List<Player> searchPlayersByName(String name) {
+    if (name == null || name.trim().isEmpty()) {
+        return getAllPlayers();
+    }
+    return playerRepository.findByNameContainingIgnoreCase(name.trim());
+}
+```
+
+#### Repository Query:
+```java
+/**
+ * Objective: Find all players whose name contains the search term (case-insensitive).
+ *
+ * Input: name - The search term to match against player names.
+ * Output: List<Player> - All players matching the search term, ordered by name.
+ */
+@Query("SELECT p FROM Player p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%')) ORDER BY p.name")
+List<Player> findByNameContainingIgnoreCase(@Param("name") String name);
+```
+
+### Request Examples
+
+```
+# Get all players
+GET http://localhost:8080/players
+
+# Search for players containing "James"
+GET http://localhost:8080/players?searchName=James
+
+# Search for players containing "Lebron" (case-insensitive)
+GET http://localhost:8080/players?searchName=lebron
+
+# Clear search and show all players
+GET http://localhost:8080/players
+```
+
+---
+
 ## 🎯 Key Thymeleaf Directives
 
 | Directive | Purpose | Example |
@@ -380,6 +519,70 @@ src/main/resources/
 | `th:object` | Creates context object | `th:object="${playerForm}"` |
 | `th:field` | Binds form fields | `th:field="*{name}"` |
 | `th:attr` | Sets any attribute | `th:attr="data-id=${player.id}"` |
+
+---
+
+## 📝 Thymeleaf Form Binding (Two-Way Data Binding)
+
+Form binding allows seamless synchronization between HTML forms and Java objects. The player form (`form.html`) demonstrates this feature:
+
+### Form Binding Example
+
+```html
+<!-- Form binds to the 'player' object from the Model -->
+<form th:object="${player}" method="POST">
+    
+    <!-- th:field binds to player.name property -->
+    <input type="text" th:field="*{name}" placeholder="Player Name">
+    
+    <!-- th:field automatically generates id, name, and binds the value -->
+    <!-- This creates: <input id="name" name="name" value="LeBron James"> -->
+    
+    <!-- Error handling for validation -->
+    <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}">
+        Error message
+    </div>
+</form>
+```
+
+### How It Works
+
+1. **Binding Direction (Controller → View):**
+   - Controller passes Model with player object: `model.addAttribute("player", player);`
+   - Thymeleaf renders form with pre-filled values from player properties
+
+2. **Form Submission (View → Controller):**
+   - User submits form with filled data
+   - Spring automatically converts form data back to Player object
+   - Controller receives populated Player object via `@ModelAttribute("player")`
+
+### Controller Method Example
+
+```java
+@PostMapping
+public String createPlayer(
+    @Valid @ModelAttribute("player") Player player,
+    BindingResult bindingResult,
+    Model model
+) {
+    if (bindingResult.hasErrors()) {
+        // Validation failed, return form with errors
+        return "players/form";
+    }
+    // Validation passed, save player to database
+    playerService.createPlayer(player);
+    return "redirect:/players";
+}
+```
+
+### Key Form Binding Features
+
+- **`th:object="${player}`** - Sets context object for the form
+- **`th:field="*{propertyName}`** - Binds input to player property (uses `*{}` relative syntax)
+- **`@Valid`** - Triggers validation constraints on Player entity
+- **`BindingResult`** - Captures validation errors to display in form
+- **`#fields.hasErrors()`** - Checks if specific field has errors
+- **`th:errors="*{field}"`** - Displays validation error messages
 
 ---
 
@@ -416,8 +619,11 @@ mvn spring-boot:run
 
 ### Access Points
 - Players List: `http://localhost:8080/players`
+- Search Players: `http://localhost:8080/players?searchName=lebron` (example: search for "lebron")
 - Player Details: `http://localhost:8080/players/{id}`
 - New Player Form: `http://localhost:8080/players/new`
+- Active Players: `http://localhost:8080/players/active`
+- Statistics: `http://localhost:8080/players/stats`
 
 ---
 

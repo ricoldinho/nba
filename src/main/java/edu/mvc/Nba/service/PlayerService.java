@@ -1,6 +1,7 @@
 package edu.mvc.nba.service;
 
 import edu.mvc.nba.model.Player;
+import edu.mvc.nba.model.Team;
 import edu.mvc.nba.repository.PlayerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -162,22 +163,22 @@ public class PlayerService {
     /**
      * Objective: Retrieves all players from a specific team.
      *
-     * Input: team - The team name.
+     * Input: team - The Team entity object.
      * Output: List<Player> - All players in that team.
      */
     @Transactional(readOnly = true)
-    public List<Player> getPlayersByTeam(String team) {
+    public List<Player> getPlayersByTeam(Team team) {
         return playerRepository.findByTeam(team);
     }
 
     /**
      * Objective: Retrieves all active players from a specific team.
      *
-     * Input: team - The team name.
+     * Input: team - The Team entity object.
      * Output: List<Player> - All active players in that team.
      */
     @Transactional(readOnly = true)
-    public List<Player> getActivePlayersByTeam(String team) {
+    public List<Player> getActivePlayersByTeam(Team team) {
         return playerRepository.findByTeamAndActive(team, true);
     }
 
@@ -196,44 +197,44 @@ public class PlayerService {
      * Objective: Finds a player by jersey number and team.
      *
      * Input: jerseyNumber - The player's jersey number.
-     *        team - The team name.
+     *        team - The Team entity object.
      * Output: Optional<Player> - The player if found.
      */
     @Transactional(readOnly = true)
-    public Optional<Player> getPlayerByJerseyNumberAndTeam(Integer jerseyNumber, String team) {
+    public Optional<Player> getPlayerByJerseyNumberAndTeam(Integer jerseyNumber, Team team) {
         return playerRepository.findByJerseyNumberAndTeam(jerseyNumber, team);
     }
 
     /**
      * Objective: Retrieves all players in a team, sorted by jersey number.
      *
-     * Input: team - The team name.
+     * Input: team - The Team entity object.
      * Output: List<Player> - All players in that team, sorted by jersey number.
      */
     @Transactional(readOnly = true)
-    public List<Player> getPlayersByTeamSortedByJerseyNumber(String team) {
+    public List<Player> getPlayersByTeamSortedByJerseyNumber(Team team) {
         return playerRepository.findByTeamOrderByJerseyNumber(team);
     }
 
     /**
      * Objective: Counts the total number of active players in a specific team.
      *
-     * Input: team - The team name.
+     * Input: team - The Team entity object.
      * Output: Long - The count of active players in that team.
      */
     @Transactional(readOnly = true)
-    public Long countActivePlayersByTeam(String team) {
+    public Long countActivePlayersByTeam(Team team) {
         return playerRepository.countByTeamAndActive(team, true);
     }
 
     /**
      * Objective: Counts the total number of players in a specific team.
      *
-     * Input: team - The team name.
+     * Input: team - The Team entity object.
      * Output: Long - The count of all players in that team.
      */
     @Transactional(readOnly = true)
-    public Long countPlayersByTeam(String team) {
+    public Long countPlayersByTeam(Team team) {
         return playerRepository.countByTeam(team);
     }
 
@@ -246,5 +247,19 @@ public class PlayerService {
     @Transactional(readOnly = true)
     public Long countAllPlayers() {
         return playerRepository.count();
+    }
+
+    /**
+     * Objective: Searches for players by name using partial matching (case-insensitive).
+     *
+     * Input: name - The search term to match against player names.
+     * Output: List<Player> - All players whose name contains the search term, sorted by name.
+     */
+    @Transactional(readOnly = true)
+    public List<Player> searchPlayersByName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            return getAllPlayers();
+        }
+        return playerRepository.findByNameContainingIgnoreCase(name.trim());
     }
 }

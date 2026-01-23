@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${isEdit} ? 'Editar Jugador' : 'Nuevo Jugador'">Nuevo Jugador</title>
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CDN for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom Styles -->
+    <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-lg">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-basketball"></i> NBA Players Manager
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/players">
+                            <i class="fas fa-list"></i> Jugadores
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/players/active">
+                            <i class="fas fa-check-circle"></i> Activos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/players/stats">
+                            <i class="fas fa-chart-bar"></i> Estadísticas
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container-lg">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 th:if="${!isEdit}"><i class="fas fa-user-plus"></i> Nuevo Jugador</h1>
+                    <h1 th:if="${isEdit}"><i class="fas fa-user-edit"></i> Editar Jugador</h1>
+                    <p th:if="${!isEdit}">Completa el formulario para agregar un nuevo jugador a la base de datos</p>
+                    <p th:if="${isEdit}">Actualiza la información del jugador</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-lg py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Form Card -->
+                <div class="form-card">
+                    <!-- Form with binding to Player object -->
+                    <form 
+                        th:action="${isEdit} ? @{/players/{id}/edit(id=${player.id})} : @{/players}"
+                        th:object="${player}"
+                        method="POST"
+                        class="form-container"
+                    >
+                        <!-- Basic Information Section -->
+                        <div class="form-section">
+                            <h3 class="form-section-title">
+                                <i class="fas fa-info-circle"></i> Información Básica
+                            </h3>
+
+                            <!-- Player Name -->
+                            <div class="mb-3">
+                                <label for="name" class="form-label">
+                                    <i class="fas fa-user"></i> Nombre del Jugador
+                                </label>
+                                <!-- th:field binds the input to player.name -->
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="name" 
+                                    th:field="*{name}"
+                                    placeholder="Ej: LeBron James"
+                                    required
+                                >
+                                <!-- Display validation errors -->
+                                <div class="form-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">
+                                    Error en el nombre
+                                </div>
+                            </div>
+
+                            <!-- Jersey Number -->
+                            <div class="mb-3">
+                                <label for="jerseyNumber" class="form-label">
+                                    <i class="fas fa-shirt"></i> Número de Camiseta
+                                </label>
+                                <input 
+                                    type="number" 
+                                    class="form-control" 
+                                    id="jerseyNumber" 
+                                    th:field="*{jerseyNumber}"
+                                    placeholder="Ej: 23"
+                                    min="0"
+                                    max="99"
+                                >
+                                <div class="form-error" th:if="${#fields.hasErrors('jerseyNumber')}" th:errors="*{jerseyNumber}">
+                                    Error en el número
+                                </div>
+                            </div>
+
+                            <!-- Team -->
+                            <div class="mb-3">
+                                <label for="team" class="form-label">
+                                    <i class="fas fa-building"></i> Equipo
+                                </label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="team" 
+                                    th:field="*{team}"
+                                    placeholder="Ej: Los Angeles Lakers"
+                                >
+                                <div class="form-error" th:if="${#fields.hasErrors('team')}" th:errors="*{team}">
+                                    Error en el equipo
+                                </div>
+                            </div>
+
+                            <!-- Country of Origin -->
+                            <div class="mb-3">
+                                <label for="countryOfOrigin" class="form-label">
+                                    <i class="fas fa-globe"></i> País de Origen
+                                </label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="countryOfOrigin" 
+                                    th:field="*{countryOfOrigin}"
+                                    placeholder="Ej: United States"
+                                >
+                                <div class="form-error" th:if="${#fields.hasErrors('countryOfOrigin')}" th:errors="*{countryOfOrigin}">
+                                    Error en el país
+                                </div>
+                            </div>
+
+                            <!-- Birth Date -->
+                            <div class="mb-3">
+                                <label for="birthDate" class="form-label">
+                                    <i class="fas fa-calendar"></i> Fecha de Nacimiento
+                                </label>
+                                <input 
+                                    type="date" 
+                                    class="form-control" 
+                                    id="birthDate" 
+                                    th:field="*{birthDate}"
+                                >
+                                <div class="form-error" th:if="${#fields.hasErrors('birthDate')}" th:errors="*{birthDate}">
+                                    Error en la fecha
+                                </div>
+                            </div>
+
+                            <!-- Photo URL -->
+                            <div class="mb-3">
+                                <label for="photoUrl" class="form-label">
+                                    <i class="fas fa-image"></i> URL de Foto
+                                </label>
+                                <input 
+                                    type="url" 
+                                    class="form-control" 
+                                    id="photoUrl" 
+                                    th:field="*{photoUrl}"
+                                    placeholder="Ej: https://example.com/image.jpg"
+                                >
+                                <small class="form-text text-muted">Proporciona una URL válida de una imagen</small>
+                                <div class="form-error" th:if="${#fields.hasErrors('photoUrl')}" th:errors="*{photoUrl}">
+                                    Error en la URL
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Status Section -->
+                        <div class="form-section">
+                            <h3 class="form-section-title">
+                                <i class="fas fa-toggle-on"></i> Estado
+                            </h3>
+
+                            <!-- Active Status Checkbox -->
+                            <div class="mb-3">
+                                <div class="form-check form-switch form-check-custom">
+                                    <input 
+                                        class="form-check-input" 
+                                        type="checkbox" 
+                                        id="active" 
+                                        th:field="*{active}"
+                                    >
+                                    <label class="form-check-label" for="active">
+                                        <i class="fas fa-check-circle"></i> Jugador Activo
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">Marca esta opción si el jugador está activo en el equipo</small>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="form-actions">
+                            <a th:href="@{/players}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-create">
+                                <i th:if="${!isEdit}" class="fas fa-plus-circle"></i>
+                                <i th:if="${isEdit}" class="fas fa-save"></i>
+                                <span th:if="${!isEdit}">Crear Jugador</span>
+                                <span th:if="${isEdit}">Guardar Cambios</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Validation Errors Summary -->
+                <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger mt-4" role="alert">
+                    <h5 class="alert-heading">
+                        <i class="fas fa-exclamation-circle"></i> Errores en el Formulario
+                    </h5>
+                    <ul class="mb-0">
+                        <li th:each="error : ${#fields.allErrors()}" th:text="${error}">
+                            Error de validación
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white-50 py-4 mt-5">
+        <div class="container-lg text-center">
+            <p class="mb-0">&copy; 2026 NBA Players Manager. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

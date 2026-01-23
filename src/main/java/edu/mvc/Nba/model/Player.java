@@ -28,14 +28,18 @@ public class Player {
     @Column(name = "jersey_number")
     private Integer jerseyNumber;
     
-    @Column(nullable = false)
-    private String team;
-    
     @Column(name = "country_of_origin")
     private String countryOfOrigin;
     
     @Column(name = "birth_date")
     private LocalDate birthDate;
+    
+    // === RELATIONSHIPS ===
+    // @ManyToOne: Establishes a many-to-one relationship where many Players belong to one Team.
+    // @JoinColumn: Specifies the foreign key column in the players table that references the teams table.
+    @ManyToOne
+    @JoinColumn(name = "team_id", nullable = false)
+    private Team team;
     
     // === VALUE OBJECTS ===
     @Embedded
@@ -58,7 +62,7 @@ public class Player {
     public Player() {}
     
     // Constructor with basic data
-    public Player(String name, Integer jerseyNumber, String team) {
+    public Player(String name, Integer jerseyNumber, Team team) {
         this.name = name;
         this.jerseyNumber = jerseyNumber;
         this.team = team;
@@ -90,11 +94,19 @@ public class Player {
     }
     
     public String getTeam() { 
-        return team; 
+        return team.getName(); 
     }
     
-    public void setTeam(String team) { 
+    public void setTeam(Team team) { 
         this.team = team; 
+    }
+    
+    public Team getTeamEntity() {
+        return team;
+    }
+    
+    public void setTeamEntity(Team team) {
+        this.team = team;
     }
     
     public String getCountryOfOrigin() { 

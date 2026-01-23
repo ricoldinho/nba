@@ -7,7 +7,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -30,15 +32,26 @@ public class PlayerController {
     }
 
     /**
-     * Objective: Displays a list of all players in the database.
+     * Objective: Displays a list of all players in the database with optional search filter by name.
      *
-     * Input: (None directly from request)
-     * Output: String - The view name "players/index" and Model containing all players.
+     * Input: searchName - Optional search term to filter players by name (case-insensitive partial match).
+     * Output: String - The view name "players/index" and Model containing filtered players.
      */
     // @GetMapping: Maps HTTP GET requests to this method for retrieving the player list.
+    // @RequestParam: Extracts the 'searchName' query parameter from the request URL with optional empty default value.
     @GetMapping
-    public String listPlayers(Model model) {
-        model.addAttribute("players", playerService.getAllPlayers());
+    public String listPlayers(
+        @RequestParam(name = "searchName", required = false, defaultValue = "") String searchName,
+        Model model
+    ) {
+        List<Player> players;
+        if (searchName != null && !searchName.trim().isEmpty()) {
+            players = playerService.searchPlayersByName(searchName);
+            model.addAttribute("searchName", searchName);
+        } else {
+            players = playerService.getAllPlayers();
+        }
+        model.addAttribute("players", players);
         return "players/index";
     }
 
@@ -295,4 +308,5 @@ public class PlayerController {
         }
         return "redirect:/players";
     }
+
 }
