@@ -41,6 +41,11 @@ public class Player {
     @JoinColumn(name = "team_id", nullable = false)
     private Team team;
     
+    // @Transient: This field is not persisted to the database; used only for form binding.
+    // This field holds the team ID for binding from HTML forms before converting to Team object.
+    @Transient
+    private Long teamId;
+    
     // === VALUE OBJECTS ===
     @Embedded
     private Position position;
@@ -163,5 +168,13 @@ public class Player {
     
     public void setActive(Boolean active) { 
         this.active = active; 
+    }
+    
+    public Long getTeamId() { 
+        return teamId; 
+    }
+    
+    public void setTeamId(Long teamId) { 
+        this.teamId = teamId; 
     }
 }

@@ -1,6 +1,7 @@
 package edu.mvc.nba.web;
 
 import edu.mvc.nba.model.Player;
+import edu.mvc.nba.model.Team;
 import edu.mvc.nba.dto.PlayerTeamDTO;
 import edu.mvc.nba.service.PlayerService;
 import edu.mvc.nba.service.TeamService;
@@ -126,8 +127,23 @@ public class PlayerController {
     ) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("isEdit", false);
+            model.addAttribute("teams", teamService.getAllActiveTeams());
             return "players/form";
         }
+        
+        // Convert teamId to Team object before saving
+        if (player.getTeamId() != null) {
+            Optional<Team> team = teamService.getTeamById(player.getTeamId());
+            if (team.isPresent()) {
+                player.setTeamEntity(team.get());
+            } else {
+                bindingResult.rejectValue("teamId", "error.player", "El equipo seleccionado no existe");
+                model.addAttribute("isEdit", false);
+                model.addAttribute("teams", teamService.getAllActiveTeams());
+                return "players/form";
+            }
+        }
+        
         Player savedPlayer = playerService.createPlayer(player);
         return "redirect:/players/" + savedPlayer.getId();
     }
@@ -146,7 +162,12 @@ public class PlayerController {
     ) {
         Optional<Player> player = playerService.getPlayerById(id);
         if (player.isPresent()) {
-            model.addAttribute("player", player.get());
+            Player p = player.get();
+            // Set teamId from the current team for form binding
+            if (p.getTeamEntity() != null) {
+                p.setTeamId(p.getTeamEntity().getId());
+            }
+            model.addAttribute("player", p);
             model.addAttribute("isEdit", true);
             model.addAttribute("teams", teamService.getAllActiveTeams());
             return "players/form";
@@ -172,8 +193,28 @@ public class PlayerController {
     ) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("isEdit", true);
+            model.addAttribute("teams", teamService.getAllActiveTeams());
             return "players/form";
         }
+        
+        // Convert teamId to Team object before saving
+        if (player.getTeamId() != null) {
+            Optional<Team> team = teamService.getTeamById(player.getTeamId());
+            if (team.isPresent()) {
+                player.setTeamEntity(team.get());
+            } else {
+                bindingResult.rejectValue("teamId", "error.player", "El equipo seleccionado no existe");
+                model.addAttribute("isEdit", true);
+                model.addAttribute("teams", teamService.getAllActiveTeams());
+                return "players/form";
+            }
+        }
+        
+        Optional<Team> team = teamService.getTeamById(player.getTeamId());
+        if (team.isPresent()) {
+            player.setTeamEntity(team.get());
+        }
+        
         Optional<Player> updatedPlayer = playerService.updatePlayer(id, player);
         if (updatedPlayer.isPresent()) {
             return "redirect:/players/" + id;
@@ -341,8 +382,7 @@ public class PlayerController {
     public String createPlayerWithTeam(
         @Valid @ModelAttribute("playerTeamDTO") PlayerTeamDTO playerTeamDTO,
         // BindingResult: Captures validation errors from the @Valid annotation.
-        BindingResult bindingResult,
-        Model model
+        BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
             return "players/player-team-form";
