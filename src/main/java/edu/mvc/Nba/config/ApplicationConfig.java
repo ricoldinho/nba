@@ -27,10 +27,10 @@ public class ApplicationConfig {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
+    // @Bean: Configures the AuthenticationProvider (Logic to verify credentials).
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService());
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
@@ -45,3 +45,7 @@ public class ApplicationConfig {
         return new BCryptPasswordEncoder();
     }
 }
+
+
+
+
