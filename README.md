@@ -8,6 +8,66 @@ This project is an educational implementation designed to demonstrate and explai
 
 ## 🆕 Recent Updates
 
+### JWT Authentication & Spring Security (January 26, 2026)
+A comprehensive **JWT authentication system** has been implemented to secure the API endpoints:
+
+✅ **Security Dependencies Added:**
+- `spring-boot-starter-security` - Spring Security framework
+- `jjwt-api`, `jjwt-impl`, `jjwt-jackson` (v0.11.5) - JSON Web Token handling
+
+✅ **User Entity:**
+- Created [User.java](src/main/java/edu/mvc/nba/model/User.java) implementing `UserDetails` interface
+- Properties: `id` (auto-generated), `username` (unique, required), `password` (required)
+- All accounts granted with `ROLE_USER` authority
+- Implements all `UserDetails` methods for Spring Security integration
+
+✅ **Repository Layer:**
+- Created [UserRepository.java](src/main/java/edu/mvc/nba/repository/UserRepository.java)
+- Method: `findByUsername(String username)` - Returns Optional<User> for user lookup
+
+✅ **Service Layer:**
+- Created [JwtService.java](src/main/java/edu/mvc/nba/service/JwtService.java) with JWT operations:
+  - `generateToken(UserDetails)` - Creates JWT token with 10-hour expiration
+  - `isTokenValid(String, UserDetails)` - Validates token signature and expiration
+  - `extractUsername(String)` - Extracts username from token claims
+  - Helper methods for token parsing and validation
+- **Security Key:** 256-bit HS256 secret key (must be moved to `application.properties` for production)
+
+✅ **Configuration Layer:**
+- Created [SecurityConfig.java](src/main/java/edu/mvc/nba/config/SecurityConfig.java):
+  - `userDetailsService()` - Loads User from database by username
+  - `authenticationProvider()` - DaoAuthenticationProvider with BCrypt password encoding
+  - `authenticationManager()` - AuthenticationManager bean for credential verification
+  - `passwordEncoder()` - BCryptPasswordEncoder for secure password storage
+  - `securityFilterChain()` - Security configuration:
+    - CSRF disabled for REST APIs
+    - `/api/auth/**` endpoints public (login/register)
+    - All other endpoints require authentication
+    - Stateless session management (no server-side sessions)
+    - JWT filter added before UsernamePasswordAuthenticationFilter
+
+✅ **JWT Authentication Filter:**
+- Created [JwtAuthenticationFilter.java](src/main/java/edu/mvc/nba/config/JwtAuthenticationFilter.java):
+  - Extends `OncePerRequestFilter` to process every request once
+  - Extracts JWT from `Authorization: Bearer <token>` header
+  - Validates token and loads user from database
+  - Sets SecurityContext authentication for Spring Security
+  - Allows request to continue if no Authorization header present
+
+✅ **Architecture:**
+- Request Flow with JWT:
+  1. Client sends request with `Authorization: Bearer <JWT_TOKEN>` header
+  2. JwtAuthenticationFilter intercepts request
+  3. Token extracted and username extracted from JWT claims
+  4. User details loaded from database via UserRepository
+  5. Token validated (signature + expiration)
+  6. SecurityContext updated with authenticated user
+  7. Request proceeds to protected endpoints
+  8. Response sent with user context available
+
+✅ **Test Support:**
+- Dependencies added for unit testing: JUnit 4 (4.13.2), Mockito (5.2.0)
+
 ### Team Entity & Player-Team Relationship (January 23, 2026)
 A new **Team entity** has been created with a **One-to-Many relationship** to Player:
 
@@ -91,7 +151,85 @@ A comprehensive **player form** has been created for adding and editing players:
 
 ---
 
-## 🏗️ Architecture Overview
+## 🔐 JWT Authentication Usage
+
+### How JWT Authentication Works in This Project
+
+The application implements a **stateless authentication system** using JWT (JSON Web Tokens). Every protected endpoint requires a valid JWT token in the request header.
+
+### Authentication Flow
+
+```
+1. User sends login credentials
+   ↓
+2. Server validates credentials against User entity
+   ↓
+3. Server generates JWT token with username as subject
+   ↓
+4. Client receives token and stores it
+   ↓
+5. Client includes token in subsequent requests:
+   Authorization: Bearer <JWT_TOKEN>
+   ↓
+6. JwtAuthenticationFilter extracts and validates token
+   ↓
+7. If valid: Request proceeds with authenticated user context
+   If invalid: Request is denied (401 Unauthorized)
+```
+
+### JWT Token Structure
+
+The JWT token contains:
+- **Header:** Algorithm (HS256) and token type
+- **Payload (Claims):** Username as subject, issued time, expiration time (10 hours)
+- **Signature:** HMAC-SHA256 signed with the secret key
+
+### Making Authenticated Requests
+
+All API requests to protected endpoints must include the JWT token:
+
+```bash
+# Example with curl
+curl -X GET http://localhost:8080/players \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9..."
+
+# Example with JavaScript/Fetch
+fetch('http://localhost:8080/players', {
+  headers: {
+    'Authorization': `Bearer ${token}`
+  }
+})
+```
+
+### Token Validation Process
+
+1. **Header Check:** Verify `Authorization: Bearer ` prefix exists
+2. **Extraction:** Extract token part (remove "Bearer " prefix)
+3. **Parsing:** Decode JWT using secret key
+4. **Username Extraction:** Get subject claim (username)
+5. **User Lookup:** Load user from database
+6. **Signature Verification:** Validate token signature matches secret key
+7. **Expiration Check:** Confirm token expiration time hasn't passed
+8. **Context Setup:** Set authenticated user in SecurityContext
+
+### Security Endpoints
+
+Currently configured endpoints:
+
+| Endpoint | Security | Description |
+|----------|----------|-------------|
+| `/api/auth/**` | ✅ PUBLIC | Login/Register endpoints (not yet implemented) |
+| `/players/**` | 🔒 PROTECTED | All player endpoints require JWT |
+| Other endpoints | 🔒 PROTECTED | Require valid JWT token |
+
+### Password Security
+
+Passwords are encoded using **BCrypt** with salt:
+- When user registers: Password is hashed with BCrypt
+- When user logs in: Entered password is hashed and compared
+- Original password is never stored
+
+---
 
 The project follows a **Clean Architecture** pattern with strict separation of concerns:
 
@@ -658,12 +796,13 @@ mvn spring-boot:run
 ```
 
 ### Access Points
-- Players List: `http://localhost:8080/players`
-- Search Players: `http://localhost:8080/players?searchName=lebron` (example: search for "lebron")
-- Player Details: `http://localhost:8080/players/{id}`
-- New Player Form: `http://localhost:8080/players/new`
-- Active Players: `http://localhost:8080/players/active`
-- Statistics: `http://localhost:8080/players/stats`
+- Players List: `http://localhost:8080/players` (requires JWT)
+- Search Players: `http://localhost:8080/players?searchName=lebron` (requires JWT)
+- Player Details: `http://localhost:8080/players/{id}` (requires JWT)
+- New Player Form: `http://localhost:8080/players/new` (requires JWT)
+- Active Players: `http://localhost:8080/players/active` (requires JWT)
+- Statistics: `http://localhost:8080/players/stats` (requires JWT)
+- **Public Endpoints:** `/api/auth/**` (login/register - not yet implemented)
 
 ---
 
@@ -672,9 +811,35 @@ mvn spring-boot:run
 - [Spring MVC Documentation](https://spring.io/projects/spring-framework)
 - [Thymeleaf Official Guide](https://www.thymeleaf.org/documentation.html)
 - [Spring Boot Reference](https://spring.io/projects/spring-boot)
+- [Spring Security Documentation](https://spring.io/projects/spring-security)
+- [JWT (JSON Web Token) - RFC 7519](https://tools.ietf.org/html/rfc7519)
+- [JJWT (Java JWT) Library](https://github.com/jwtk/jjwt)
 
 ---
 
-## 📄 License
+## ⚠️ Important Security Notes
+
+### JWT Secret Key
+- **Current:** Hardcoded in [JwtService.java](src/main/java/edu/mvc/nba/service/JwtService.java)
+- **Production:** MUST be moved to `application.properties` or environment variables
+- **Requirements:** At least 256 bits (32 characters) for HS256 algorithm
+- **Never:** Commit secret keys to version control
+
+### Token Expiration
+- **Duration:** 10 hours
+- **Validation:** Every request checks token expiration
+- **Expired Tokens:** Treated as unauthorized (401 response)
+
+### Login/Register Endpoints
+- **Status:** Not yet implemented
+- **TODO:** Create AuthController with `/api/auth/register` and `/api/auth/login` endpoints
+- **TODO:** Hash passwords before storing in database
+
+### Session Management
+- **Type:** Stateless (no server-side sessions)
+- **Reason:** JWT tokens are self-contained and don't require session storage
+- **Benefit:** Easily scalable across multiple servers
+
+---
 
 This is an educational project for learning purposes.
