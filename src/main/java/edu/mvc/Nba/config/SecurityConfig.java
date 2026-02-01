@@ -22,12 +22,14 @@ public class SecurityConfig {
         this.authenticationProvider = authenticationProvider;
     }
 
+    // @Bean: Main Security Chain Configuration.
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/css/**", "/js/**").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/css/**", "/js/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

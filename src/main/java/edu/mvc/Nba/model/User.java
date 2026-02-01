@@ -58,4 +58,11 @@ public class User implements UserDetails {
     public boolean isEnabled() { return true; }
     
     public Long getId() { return id; }
+
+    @Override
+    public String toString() {
+        return "User [id=" + id + ", username=" + username + ", password=" + password + "]";
+    }
+
+    
 }

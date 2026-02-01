@@ -53,8 +53,22 @@ INSERT INTO players (
 (1, 8.1, '2000-02-29', 45.4, 196, 0, 19.3, 6.6, 95, 'USA', 'Tyrese Haliburton', 'https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/latest/260x190/1630169.png', 14, 'POINT_GUARD'),
 (1, 4.1, '2001-08-05', 47.5, 193, 5, 25.9, 5.4, 102, 'USA', 'Anthony Edwards', 'https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/latest/260x190/1630162.png', 15, 'SHOOTING_GUARD');
 
+
+-- Insert sample users
+-- Passwords are encrypted using BCrypt
+-- admin: Admin@123
+-- user1: User@123
+-- player1: Player@123
+-- manager: Manager@123
+-- coach: Coach@123
+INSERT INTO users (username, password) VALUES
+('admin', '$2a$10$0hu4CONr.xZL3tItqMs5AuVhLyHVxZQvOabG9C/pYq6SAlC3mwgE.'),
+('user1', '$2a$10$Fi9kL62C5R/j56X7DRdSK.fyaNptgMvzJgTAY8j.MT6dXNV3jonjK'),
+('player1', '$2a$10$AEAf0GSCNBIbgkax8A9qxu9rv7KuDMySp/TgvUSG0e2psh26uNqI.'),
+('manager', '$2a$10$HCtOEXXFEJsdxIQl1vlDz.wZt67AEAKoOKJY.P16zGH4XNCQFGpDG'),
+('coach', '$2a$10$.3PsOUM3GdiH1tNUR.j05.9jyC2kB9soDQqyLFzag93tBqY2h7l/6');
+
 -- ============================================
 -- RE-ENABLE FOREIGN KEY CHECKS
 -- ============================================
 SET FOREIGN_KEY_CHECKS=1;
-
