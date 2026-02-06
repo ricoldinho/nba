@@ -22,21 +22,23 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    // We keep it simple: every user has a generic "ROLE_USER" for now.
-    // In a real app, you would have a Roles table or Enum.
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
     
     public User() {}
 
-    public User(String username, String password) {
+    public User(String username, String password, Role role) {
         this.username = username;
         this.password = password;
+        this.role = role;
     }
 
     // --- UserDetails Implementation ---
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override
@@ -58,10 +60,12 @@ public class User implements UserDetails {
     public boolean isEnabled() { return true; }
     
     public Long getId() { return id; }
+    public Role getRole() { return role; }
+
 
     @Override
     public String toString() {
-        return "User [id=" + id + ", username=" + username + ", password=" + password + "]";
+        return "User [id=" + id + ", username=" + username + ", password=" + password + ", role=" + role + "]";
     }
 
     

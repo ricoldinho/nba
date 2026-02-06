@@ -1,15 +1,16 @@
 package edu.mvc.nba.web;
 
-import edu.mvc.nba.dto.AuthResponse;
-import edu.mvc.nba.dto.LoginRequest;
-import edu.mvc.nba.dto.RegisterRequest;
-import edu.mvc.nba.service.AuthService;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import edu.mvc.nba.dto.AuthResponse;
+import edu.mvc.nba.dto.LoginRequest;
+import edu.mvc.nba.dto.RegisterRequest;
+import edu.mvc.nba.service.AuthService;
+import jakarta.validation.Valid;
 
 // @RestController: Indicates this class handles REST requests and returns JSON responses.
 // @RequestMapping: Sets the base URL path "/api/auth" for all endpoints in this controller.
@@ -32,10 +33,9 @@ public class AuthController {
     // @PostMapping("/register"): Maps POST requests to /api/auth/register.
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(
-        // @RequestBody: Deserializes JSON request body into the Java Record.
-        // @Valid: Applies validation constraints defined in the DTO.
-        @RequestBody @Valid RegisterRequest request
-    ) {
+            // @RequestBody: Deserializes JSON request body into the Java Record.
+            // @Valid: Applies validation constraints defined in the DTO.
+            @RequestBody @Valid RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
     }
 
@@ -48,8 +48,7 @@ public class AuthController {
     // @PostMapping("/login"): Maps POST requests to /api/auth/login.
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(
-        @RequestBody @Valid LoginRequest request
-    ) {
+            @RequestBody @Valid LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 }

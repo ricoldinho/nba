@@ -3,6 +3,7 @@ package edu.mvc.nba.service;
 import edu.mvc.nba.dto.AuthResponse;
 import edu.mvc.nba.dto.LoginRequest;
 import edu.mvc.nba.dto.RegisterRequest;
+import edu.mvc.nba.model.Role;
 import edu.mvc.nba.model.User;
 import edu.mvc.nba.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -39,10 +40,11 @@ public class AuthService {
     // @Transactional: Ensures the save operation is atomic.
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        // 1. Build User entity with encoded password
+        // 1. Build User entity with encoded password and default role
         User user = new User(
             request.username(), 
-            passwordEncoder.encode(request.password())
+            passwordEncoder.encode(request.password()),
+            Role.USER
         );
         
         // 2. Persist to Database

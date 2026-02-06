@@ -6,6 +6,7 @@ import edu.mvc.nba.dto.PlayerTeamDTO;
 import edu.mvc.nba.service.PlayerService;
 import edu.mvc.nba.service.TeamService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -44,6 +45,7 @@ public class PlayerController {
     // @GetMapping: Maps HTTP GET requests to this method for retrieving the player list.
     // @RequestParam: Extracts the 'searchName' query parameter from the request URL with optional empty default value.
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public String listPlayers(
         @RequestParam(name = "searchName", required = false, defaultValue = "") String searchName,
         Model model
@@ -66,6 +68,7 @@ public class PlayerController {
      * Output: String - The view name "players/active" and Model containing active players.
      */
     @GetMapping("/active")
+    @PreAuthorize("isAuthenticated()")
     public String listActivePlayers(Model model) {
         model.addAttribute("players", playerService.getAllActivePlayers());
         return "players/active";
@@ -80,6 +83,7 @@ public class PlayerController {
     // @GetMapping("{id}"): Maps HTTP GET requests to this method with a path variable for the player ID.
     // @PathVariable: Extracts the ID from the URL path and injects it as a method parameter.
     @GetMapping("{id}")
+    @PreAuthorize("isAuthenticated()")
     public String getPlayerDetails(
         // @PathVariable: Binds the {id} from the URL to the id parameter.
         @PathVariable Long id,
@@ -101,6 +105,7 @@ public class PlayerController {
      */
     // @GetMapping("new"): Maps HTTP GET requests to show the create player form.
     @GetMapping("new")
+    @PreAuthorize("hasRole('ADMIN')")
     public String showCreateForm(Model model) {
         model.addAttribute("player", new Player());
         model.addAttribute("isEdit", false);
@@ -119,6 +124,7 @@ public class PlayerController {
     // @Valid: Triggers validation constraints defined in the Player entity (e.g., @NotNull, @Column(nullable = false)).
     // @ModelAttribute: Binds form data to the player object automatically.
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public String createPlayer(
         @Valid @ModelAttribute("player") Player player,
         // BindingResult: Captures validation errors from the @Valid annotation.
@@ -156,6 +162,7 @@ public class PlayerController {
      */
     // @GetMapping("{id}/edit"): Maps HTTP GET requests to show the edit form for a specific player.
     @GetMapping("{id}/edit")
+    @PreAuthorize("hasRole('ADMIN')")
     public String showEditForm(
         @PathVariable Long id,
         Model model
@@ -185,6 +192,7 @@ public class PlayerController {
      */
     // @PostMapping("{id}/edit"): Maps HTTP POST requests for updating a specific player.
     @PostMapping("{id}/edit")
+    @PreAuthorize("hasRole('ADMIN')")
     public String updatePlayer(
         @PathVariable Long id,
         @Valid @ModelAttribute("player") Player player,
@@ -230,6 +238,7 @@ public class PlayerController {
      */
     // @PostMapping("{id}"): Maps HTTP POST requests with _method=DELETE for deleting a specific player.
     @PostMapping("{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String deletePlayerModal(
         @PathVariable Long id
     ) {
@@ -245,6 +254,7 @@ public class PlayerController {
      */
     // @RequestParam: Extracts the 'team' query parameter from the request URL (e.g., ?team=Lakers).
     @GetMapping("/team")
+    @PreAuthorize("isAuthenticated()")
     public String getPlayersByTeam(
         @RequestParam String team,
         Model model
@@ -261,6 +271,7 @@ public class PlayerController {
      * Output: String - The view name "players/by-team" with active players filtered by team.
      */
     @GetMapping("/team/active")
+    @PreAuthorize("isAuthenticated()")
     public String getActivePlayersByTeam(
         @RequestParam String team,
         Model model
@@ -277,6 +288,7 @@ public class PlayerController {
      * Output: String - The view name "players/by-country" with players filtered by country.
      */
     @GetMapping("/country")
+    @PreAuthorize("isAuthenticated()")
     public String getPlayersByCountry(
         @RequestParam String country,
         Model model
@@ -293,6 +305,7 @@ public class PlayerController {
      * Output: String - The view name "players/team-stats" with team statistics.
      */
     @GetMapping("/stats/team")
+    @PreAuthorize("isAuthenticated()")
     public String getTeamStatistics(
         @RequestParam String team,
         Model model
@@ -315,6 +328,7 @@ public class PlayerController {
      * Output: String - The view name "players/stats" with overall player statistics.
      */
     @GetMapping("/stats")
+    @PreAuthorize("isAuthenticated()")
     public String getOverallStatistics(Model model) {
         Long totalPlayers = playerService.countAllPlayers();
         model.addAttribute("totalPlayers", totalPlayers);
@@ -328,6 +342,7 @@ public class PlayerController {
      * Output: String - Redirect to the player's details page or player list.
      */
     @GetMapping("{id}/deactivate")
+    @PreAuthorize("hasRole('ADMIN')")
     public String deactivatePlayer(
         @PathVariable Long id
     ) {
@@ -345,6 +360,7 @@ public class PlayerController {
      * Output: String - Redirect to the player's details page or player list.
      */
     @GetMapping("{id}/reactivate")
+    @PreAuthorize("hasRole('ADMIN')")
     public String reactivatePlayer(
         @PathVariable Long id
     ) {
@@ -363,6 +379,7 @@ public class PlayerController {
      */
     // @GetMapping("new-with-team"): Maps HTTP GET requests to show the combined create form.
     @GetMapping("new-with-team")
+    @PreAuthorize("hasRole('ADMIN')")
     public String showCreatePlayerWithTeamForm(Model model) {
         model.addAttribute("playerTeamDTO", new PlayerTeamDTO());
         return "players/player-team-form";
@@ -379,6 +396,7 @@ public class PlayerController {
     // @Valid: Triggers validation constraints defined in the PlayerTeamDTO.
     // @ModelAttribute: Binds form data to the playerTeamDTO object automatically.
     @PostMapping("create-with-team")
+    @PreAuthorize("hasRole('ADMIN')")
     public String createPlayerWithTeam(
         @Valid @ModelAttribute("playerTeamDTO") PlayerTeamDTO playerTeamDTO,
         // BindingResult: Captures validation errors from the @Valid annotation.

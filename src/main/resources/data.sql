@@ -61,12 +61,12 @@ INSERT INTO players (
 -- player1: Player@123
 -- manager: Manager@123
 -- coach: Coach@123
-INSERT INTO users (username, password) VALUES
-('admin', '$2a$10$0hu4CONr.xZL3tItqMs5AuVhLyHVxZQvOabG9C/pYq6SAlC3mwgE.'),
-('user1', '$2a$10$Fi9kL62C5R/j56X7DRdSK.fyaNptgMvzJgTAY8j.MT6dXNV3jonjK'),
-('player1', '$2a$10$AEAf0GSCNBIbgkax8A9qxu9rv7KuDMySp/TgvUSG0e2psh26uNqI.'),
-('manager', '$2a$10$HCtOEXXFEJsdxIQl1vlDz.wZt67AEAKoOKJY.P16zGH4XNCQFGpDG'),
-('coach', '$2a$10$.3PsOUM3GdiH1tNUR.j05.9jyC2kB9soDQqyLFzag93tBqY2h7l/6');
+INSERT INTO users (username, password, role) VALUES
+('admin', '$2a$10$0hu4CONr.xZL3tItqMs5AuVhLyHVxZQvOabG9C/pYq6SAlC3mwgE.', 'ADMIN'),
+('user1', '$2a$10$Fi9kL62C5R/j56X7DRdSK.fyaNptgMvzJgTAY8j.MT6dXNV3jonjK', 'USER'),
+('player1', '$2a$10$AEAf0GSCNBIbgkax8A9qxu9rv7KuDMySp/TgvUSG0e2psh26uNqI.', 'USER'),
+('manager', '$2a$10$HCtOEXXFEJsdxIQl1vlDz.wZt67AEAKoOKJY.P16zGH4XNCQFGpDG', 'USER'),
+('coach', '$2a$10$.3PsOUM3GdiH1tNUR.j05.9jyC2kB9soDQqyLFzag93tBqY2h7l/6', 'USER');
 
 -- ============================================
 -- RE-ENABLE FOREIGN KEY CHECKS

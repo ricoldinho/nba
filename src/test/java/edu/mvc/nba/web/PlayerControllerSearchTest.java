@@ -1,8 +1,18 @@
 package edu.mvc.nba.web;
 
-import edu.mvc.nba.model.Player;
-import edu.mvc.nba.service.PlayerService;
-import edu.mvc.nba.service.TeamService;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -10,13 +20,10 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import edu.mvc.nba.model.Player;
+import edu.mvc.nba.service.PlayerService;
+import edu.mvc.nba.service.TeamService;
+import edu.mvc.nba.web.PlayerController;
 
 /**
  * Objective: Test the player search functionality in the Controller layer.
@@ -44,14 +51,16 @@ public class PlayerControllerSearchTest {
      */
     @Before
     public void setUp() {
-        // MockitoAnnotations.openMocks: Initializes Mockito annotations for this test class.
+        // MockitoAnnotations.openMocks: Initializes Mockito annotations for this test
+        // class.
         MockitoAnnotations.openMocks(this);
         playerController = new PlayerController(playerService, teamService);
         mockMvc = MockMvcBuilders.standaloneSetup(playerController).build();
     }
 
     /**
-     * Objective: Verify that GET /players returns all players when no search parameter is provided.
+     * Objective: Verify that GET /players returns all players when no search
+     * parameter is provided.
      *
      * Input: GET /players (no searchName parameter)
      * Output: HTTP 200 status, view name "players/index", all players in model.
@@ -62,20 +71,20 @@ public class PlayerControllerSearchTest {
         Player player1 = new Player();
         player1.setId(1L);
         player1.setName("LeBron James");
-        
+
         Player player2 = new Player();
         player2.setId(2L);
         player2.setName("Michael Jordan");
-        
+
         List<Player> allPlayers = Arrays.asList(player1, player2);
         when(playerService.getAllPlayers()).thenReturn(allPlayers);
 
         // Act & Assert
         mockMvc.perform(get("/players"))
-            .andExpect(status().isOk())
-            .andExpect(view().name("players/index"))
-            .andExpect(model().attributeExists("players"))
-            .andExpect(model().attribute("players", allPlayers));
+                .andExpect(status().isOk())
+                .andExpect(view().name("players/index"))
+                .andExpect(model().attributeExists("players"))
+                .andExpect(model().attribute("players", allPlayers));
 
         verify(playerService).getAllPlayers();
         verify(playerService, never()).searchPlayersByName(anyString());
@@ -94,23 +103,24 @@ public class PlayerControllerSearchTest {
         Player player1 = new Player();
         player1.setId(1L);
         player1.setName("LeBron James");
-        
+
         List<Player> filteredPlayers = Collections.singletonList(player1);
         when(playerService.searchPlayersByName(searchName)).thenReturn(filteredPlayers);
 
         // Act & Assert
         mockMvc.perform(get("/players").param("searchName", searchName))
-            .andExpect(status().isOk())
-            .andExpect(view().name("players/index"))
-            .andExpect(model().attributeExists("players"))
-            .andExpect(model().attribute("players", filteredPlayers))
-            .andExpect(model().attribute("searchName", searchName));
+                .andExpect(status().isOk())
+                .andExpect(view().name("players/index"))
+                .andExpect(model().attributeExists("players"))
+                .andExpect(model().attribute("players", filteredPlayers))
+                .andExpect(model().attribute("searchName", searchName));
 
         verify(playerService).searchPlayersByName(searchName);
     }
 
     /**
-     * Objective: Verify that search is case-insensitive by searching with lowercase.
+     * Objective: Verify that search is case-insensitive by searching with
+     * lowercase.
      *
      * Input: GET /players?searchName=lebron
      * Output: HTTP 200 status, players matching "lebron" (case-insensitive).
@@ -122,15 +132,15 @@ public class PlayerControllerSearchTest {
         Player player1 = new Player();
         player1.setId(1L);
         player1.setName("LeBron James");
-        
+
         List<Player> filteredPlayers = Collections.singletonList(player1);
         when(playerService.searchPlayersByName(searchName)).thenReturn(filteredPlayers);
 
         // Act & Assert
         mockMvc.perform(get("/players").param("searchName", searchName))
-            .andExpect(status().isOk())
-            .andExpect(view().name("players/index"))
-            .andExpect(model().attribute("players", filteredPlayers));
+                .andExpect(status().isOk())
+                .andExpect(view().name("players/index"))
+                .andExpect(model().attribute("players", filteredPlayers));
 
         verify(playerService).searchPlayersByName(searchName);
     }
@@ -147,19 +157,19 @@ public class PlayerControllerSearchTest {
         Player player1 = new Player();
         player1.setId(1L);
         player1.setName("LeBron James");
-        
+
         Player player2 = new Player();
         player2.setId(2L);
         player2.setName("Michael Jordan");
-        
+
         List<Player> allPlayers = Arrays.asList(player1, player2);
         when(playerService.getAllPlayers()).thenReturn(allPlayers);
 
         // Act & Assert
         mockMvc.perform(get("/players").param("searchName", ""))
-            .andExpect(status().isOk())
-            .andExpect(view().name("players/index"))
-            .andExpect(model().attribute("players", allPlayers));
+                .andExpect(status().isOk())
+                .andExpect(view().name("players/index"))
+                .andExpect(model().attribute("players", allPlayers));
 
         verify(playerService).getAllPlayers();
         verify(playerService, never()).searchPlayersByName(anyString());
@@ -179,10 +189,10 @@ public class PlayerControllerSearchTest {
 
         // Act & Assert
         mockMvc.perform(get("/players").param("searchName", searchName))
-            .andExpect(status().isOk())
-            .andExpect(view().name("players/index"))
-            .andExpect(model().attribute("players", Collections.emptyList()))
-            .andExpect(model().attribute("searchName", searchName));
+                .andExpect(status().isOk())
+                .andExpect(view().name("players/index"))
+                .andExpect(model().attribute("players", Collections.emptyList()))
+                .andExpect(model().attribute("searchName", searchName));
 
         verify(playerService).searchPlayersByName(searchName);
     }
@@ -200,15 +210,15 @@ public class PlayerControllerSearchTest {
         Player player1 = new Player();
         player1.setId(1L);
         player1.setName("LeBron James");
-        
+
         List<Player> filteredPlayers = Collections.singletonList(player1);
         when(playerService.searchPlayersByName(searchName)).thenReturn(filteredPlayers);
 
         // Act & Assert
         mockMvc.perform(get("/players").param("searchName", searchName))
-            .andExpect(status().isOk())
-            .andExpect(view().name("players/index"))
-            .andExpect(model().attribute("players", filteredPlayers));
+                .andExpect(status().isOk())
+                .andExpect(view().name("players/index"))
+                .andExpect(model().attribute("players", filteredPlayers));
 
         verify(playerService).searchPlayersByName(searchName);
     }

@@ -1,20 +1,25 @@
 package edu.mvc.nba.service;
 
-import edu.mvc.nba.model.Player;
-import edu.mvc.nba.repository.PlayerRepository;
-
-import org.junit.Test;
-import org.junit.Before;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import edu.mvc.nba.model.Player;
+import edu.mvc.nba.repository.PlayerRepository;
+import edu.mvc.nba.service.PlayerService;
 
 /**
  * Objective: Test the player search functionality using partial name matching.
@@ -38,7 +43,8 @@ public class PlayerServiceSearchTest {
      */
     @Before
     public void setUp() {
-        // MockitoAnnotations.openMocks: Initializes Mockito annotations for this test class.
+        // MockitoAnnotations.openMocks: Initializes Mockito annotations for this test
+        // class.
         MockitoAnnotations.openMocks(this);
     }
 
@@ -55,14 +61,14 @@ public class PlayerServiceSearchTest {
         Player player1 = new Player();
         player1.setId(1L);
         player1.setName("LeBron James");
-        
+
         Player player2 = new Player();
         player2.setId(2L);
         player2.setName("Lebron James Jr");
-        
+
         List<Player> expectedPlayers = Arrays.asList(player1, player2);
         when(playerRepository.findByNameContainingIgnoreCase(searchName))
-            .thenReturn(expectedPlayers);
+                .thenReturn(expectedPlayers);
 
         // Act
         List<Player> result = playerService.searchPlayersByName(searchName);
@@ -75,7 +81,8 @@ public class PlayerServiceSearchTest {
     }
 
     /**
-     * Objective: Verify that search returns all players when search term is null or empty.
+     * Objective: Verify that search returns all players when search term is null or
+     * empty.
      *
      * Input: searchName = null or ""
      * Output: List<Player> containing all players in the database.
@@ -87,11 +94,11 @@ public class PlayerServiceSearchTest {
         Player player1 = new Player();
         player1.setId(1L);
         player1.setName("LeBron James");
-        
+
         Player player2 = new Player();
         player2.setId(2L);
         player2.setName("Michael Jordan");
-        
+
         List<Player> expectedPlayers = Arrays.asList(player1, player2);
         when(playerRepository.findAll()).thenReturn(expectedPlayers);
 
@@ -106,7 +113,8 @@ public class PlayerServiceSearchTest {
     }
 
     /**
-     * Objective: Verify that search returns empty list when no players match the search term.
+     * Objective: Verify that search returns empty list when no players match the
+     * search term.
      *
      * Input: searchName = "NonexistentPlayer"
      * Output: Empty List<Player>.
@@ -116,7 +124,7 @@ public class PlayerServiceSearchTest {
         // Arrange
         String searchName = "NonexistentPlayer";
         when(playerRepository.findByNameContainingIgnoreCase(searchName))
-            .thenReturn(Collections.emptyList());
+                .thenReturn(Collections.emptyList());
 
         // Act
         List<Player> result = playerService.searchPlayersByName(searchName);
@@ -128,7 +136,8 @@ public class PlayerServiceSearchTest {
     }
 
     /**
-     * Objective: Verify that search is case-insensitive and finds players regardless of case.
+     * Objective: Verify that search is case-insensitive and finds players
+     * regardless of case.
      *
      * Input: searchName = "lebron" (lowercase)
      * Output: List<Player> containing "LeBron James" (proper case).
@@ -140,10 +149,10 @@ public class PlayerServiceSearchTest {
         Player player1 = new Player();
         player1.setId(1L);
         player1.setName("LeBron James");
-        
+
         List<Player> expectedPlayers = Collections.singletonList(player1);
         when(playerRepository.findByNameContainingIgnoreCase(searchName))
-            .thenReturn(expectedPlayers);
+                .thenReturn(expectedPlayers);
 
         // Act
         List<Player> result = playerService.searchPlayersByName(searchName);
@@ -156,9 +165,10 @@ public class PlayerServiceSearchTest {
     }
 
     /**
-     * Objective: Verify that search trims whitespace from search term before querying.
+     * Objective: Verify that search trims whitespace from search term before
+     * querying.
      *
-     * Input: searchName = "  James  " (with leading/trailing spaces)
+     * Input: searchName = " James " (with leading/trailing spaces)
      * Output: List<Player> with trimmed search term applied.
      */
     @Test
@@ -168,10 +178,10 @@ public class PlayerServiceSearchTest {
         Player player1 = new Player();
         player1.setId(1L);
         player1.setName("LeBron James");
-        
+
         List<Player> expectedPlayers = Collections.singletonList(player1);
         when(playerRepository.findByNameContainingIgnoreCase("James"))
-            .thenReturn(expectedPlayers);
+                .thenReturn(expectedPlayers);
 
         // Act
         List<Player> result = playerService.searchPlayersByName(searchName);

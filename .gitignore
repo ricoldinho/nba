@@ -1,5 +1,11 @@
+# Build artifacts
+/target/
+
+# Log files
+error.log
+output.log
+
 HELP.md
-target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -17,7 +23,7 @@ target/
 .idea
 *.iws
 *.iml
-*.ipr
+.ipr
 
 ### NetBeans ###
 /nbproject/private/
